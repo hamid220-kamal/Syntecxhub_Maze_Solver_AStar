@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A* Maze Solver Pro | Syntecxhub AI Internship</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="container">
+        <header>
+            <h1>🧩 A* Maze Solver <span class="pro-badge">PRO</span></h1>
+            <p class="subtitle">Advanced AI Pathfinding with Algorithm Comparison</p>
+            <span class="badge">Syntecxhub AI Internship - Project 1</span>
+        </header>
+
+        <main class="main-grid">
+            <!-- Maze Display -->
+            <div class="card maze-card">
+                <div class="card-header">
+                    <h2 class="card-title">Maze Grid</h2>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="single">Single</button>
+                        <button class="toggle-btn" data-view="race">Race Mode</button>
+                    </div>
+                </div>
+
+                <div id="single-view" class="maze-view active">
+                    <div class="maze-container">
+                        <div id="maze-grid"></div>
+                    </div>
+                </div>
+
+                <div id="race-view" class="maze-view">
+                    <div class="race-grid">
+                        <div class="race-item">
+                            <div class="race-label">A* Search</div>
+                            <div id="maze-astar" class="mini-maze"></div>
+                            <div class="race-stats" id="stats-astar">-</div>
+                        </div>
+                        <div class="race-item">
+                            <div class="race-label">Dijkstra</div>
+                            <div id="maze-dijkstra" class="mini-maze"></div>
+                            <div class="race-stats" id="stats-dijkstra">-</div>
+                        </div>
+                        <div class="race-item">
+                            <div class="race-label">Greedy BFS</div>
+                            <div id="maze-greedy" class="mini-maze"></div>
+                            <div class="race-stats" id="stats-greedy">-</div>
+                        </div>
+                        <div class="race-item">
+                            <div class="race-label">BFS</div>
+                            <div id="maze-bfs" class="mini-maze"></div>
+                            <div class="race-stats" id="stats-bfs">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color start"></div><span>Start</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color goal"></div><span>Goal</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color wall"></div><span>Wall</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div><span>Visited</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color path"></div><span>Path</span>
+                    </div>
+                </div>
+
+                <div class="draw-mode">
+                    <div class="draw-mode-title">🖌️ Draw Mode</div>
+                    <div class="mode-buttons">
+                        <button class="mode-btn empty-mode" data-mode="empty">Empty</button>
+                        <button class="mode-btn wall-mode active" data-mode="wall">Wall</button>
+                        <button class="mode-btn start-mode" data-mode="start">Start</button>
+                        <button class="mode-btn goal-mode" data-mode="goal">Goal</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <div class="card">
+                    <h2 class="card-title">⚙️ Controls</h2>
+
+                    <div class="control-group">
+                        <label>Grid Size</label>
+                        <select id="grid-size">
+                            <option value="10">10 × 10</option>
+                            <option value="15" selected>15 × 15</option>
+                            <option value="20">20 × 20</option>
+                            <option value="25">25 × 25</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Heuristic (A*/Greedy)</label>
+                        <select id="heuristic">
+                            <option value="manhattan">Manhattan Distance</option>
+                            <option value="euclidean">Euclidean Distance</option>
+                            <option value="chebyshev">Chebyshev Distance</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Animation Speed: <span id="speed-value">30</span>ms</label>
+                        <input type="range" id="speed" min="5" max="200" value="30">
+                    </div>
+
+                    <div class="control-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="learning-mode">
+                            <span>🎓 Learning Mode (Show Details)</span>
+                        </label>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="solve-btn">▶️ Solve</button>
+                        <button class="btn btn-accent" id="race-btn">🏎️ Algorithm Race</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">🏗️ Maze Generation</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="gen-backtrack">Recursive Backtrack</button>
+                        <button class="btn btn-secondary" id="gen-prims">Prim's Algorithm</button>
+                        <button class="btn btn-secondary" id="gen-random">Random Walls</button>
+                        <button class="btn btn-danger" id="clear-btn">🗑️ Clear All</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">📊 Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-path">-</div>
+                            <div class="stat-label">Path Length</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-explored">-</div>
+                            <div class="stat-label">Nodes Explored</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-time">-</div>
+                            <div class="stat-label">Time (ms)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-efficiency">-</div>
+                            <div class="stat-label">Efficiency %</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Mode Panel -->
+                <div class="card learning-panel" id="learning-panel" style="display: none;">
+                    <h2 class="card-title">🎓 Algorithm Explanation</h2>
+                    <div id="learning-content">
+                        <p>Enable learning mode and solve to see step-by-step explanations.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            Made with ❤️ by <strong>Hamid Kamal</strong> |
+            <a href="https://github.com/hamid220-kamal/Syntecxhub_Maze_Solver_AStar" target="_blank">View on GitHub</a>
+        </footer>
+    </div>
+
+    <script src="algorithms.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
