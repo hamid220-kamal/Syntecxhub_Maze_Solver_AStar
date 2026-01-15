@@ -1,0 +1,7 @@
+# A* Maze Solver - Dependencies
+# =============================
+# Core functionality works without any dependencies!
+# Optional: Install these for graphical visualization
+
+matplotlib>=3.5.0
+numpy>=1.21.0
