@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A* Maze Solver | Syntecxhub AI Internship</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-dark: #0a0a0f;
@@ -49,7 +51,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
@@ -111,8 +113,8 @@
             background: var(--bg-card);
             border-radius: 16px;
             padding: 24px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         }
 
         .card-title {
@@ -145,7 +147,7 @@
             background: var(--bg-surface);
             padding: 15px;
             border-radius: 12px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .cell {
@@ -166,29 +168,37 @@
             z-index: 10;
         }
 
-        .cell.empty { background: var(--cell-empty); }
-        .cell.wall { 
-            background: var(--cell-wall); 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        .cell.empty {
+            background: var(--cell-empty);
         }
-        .cell.start { 
-            background: var(--cell-start); 
+
+        .cell.wall {
+            background: var(--cell-wall);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .cell.start {
+            background: var(--cell-start);
             box-shadow: 0 0 15px var(--cell-start);
         }
-        .cell.goal { 
-            background: var(--cell-goal); 
+
+        .cell.goal {
+            background: var(--cell-goal);
             box-shadow: 0 0 15px var(--cell-goal);
         }
-        .cell.path { 
-            background: var(--cell-path); 
+
+        .cell.path {
+            background: var(--cell-path);
             box-shadow: 0 0 10px var(--cell-path);
             animation: pathPulse 0.5s ease;
         }
-        .cell.visited { 
-            background: var(--cell-visited); 
+
+        .cell.visited {
+            background: var(--cell-visited);
             opacity: 0.6;
             animation: visitedFade 0.3s ease;
         }
+
         .cell.current {
             background: var(--cell-current);
             box-shadow: 0 0 20px var(--cell-current);
@@ -196,18 +206,39 @@
         }
 
         @keyframes pathPulse {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         @keyframes visitedFade {
-            0% { transform: scale(1.2); opacity: 0; }
-            100% { transform: scale(1); opacity: 0.6; }
+            0% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
         }
 
         @keyframes currentPulse {
-            0%, 100% { box-shadow: 0 0 20px var(--cell-current); }
-            50% { box-shadow: 0 0 30px var(--cell-current), 0 0 40px var(--cell-current); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px var(--cell-current);
+            }
+
+            50% {
+                box-shadow: 0 0 30px var(--cell-current), 0 0 40px var(--cell-current);
+            }
         }
 
         /* Controls */
@@ -222,11 +253,12 @@
             margin-bottom: 8px;
         }
 
-        select, input[type="range"] {
+        select,
+        input[type="range"] {
             width: 100%;
             padding: 12px;
             background: var(--bg-surface);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: var(--text-primary);
             font-size: 0.95rem;
@@ -282,11 +314,11 @@
         .btn-secondary {
             background: var(--bg-surface);
             color: var(--text-primary);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .btn-success {
@@ -394,10 +426,21 @@
             border-color: var(--text-primary);
         }
 
-        .mode-btn.empty-mode { background: var(--cell-empty); }
-        .mode-btn.wall-mode { background: var(--cell-wall); }
-        .mode-btn.start-mode { background: var(--cell-start); }
-        .mode-btn.goal-mode { background: var(--cell-goal); }
+        .mode-btn.empty-mode {
+            background: var(--cell-empty);
+        }
+
+        .mode-btn.wall-mode {
+            background: var(--cell-wall);
+        }
+
+        .mode-btn.start-mode {
+            background: var(--cell-start);
+        }
+
+        .mode-btn.goal-mode {
+            background: var(--cell-goal);
+        }
 
         /* Algorithm info */
         .algo-info {
@@ -421,7 +464,7 @@
 
         .algo-info code {
             font-family: 'Fira Code', monospace;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.8rem;
@@ -442,15 +485,26 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            h1 { font-size: 1.8rem; }
-            .cell { width: 25px; height: 25px; font-size: 10px; }
-            .stats-grid { grid-template-columns: 1fr; }
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .cell {
+                width: 25px;
+                height: 25px;
+                font-size: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="bg-animation"></div>
-    
+
     <div class="container">
         <header>
             <h1>🧩 A* Maze Solver</h1>
@@ -465,7 +519,7 @@
                 <div class="maze-container">
                     <div id="maze-grid"></div>
                 </div>
-                
+
                 <div class="legend">
                     <div class="legend-item">
                         <div class="legend-color" style="background: var(--cell-start)"></div>
@@ -504,7 +558,7 @@
             <div>
                 <div class="card">
                     <h2 class="card-title">Controls</h2>
-                    
+
                     <div class="control-group">
                         <label>Grid Size</label>
                         <select id="grid-size">
@@ -562,16 +616,17 @@
                     <div class="algo-info">
                         <h4>💡 A* Algorithm</h4>
                         <p>A* finds the shortest path using:<br>
-                        <code>f(n) = g(n) + h(n)</code><br>
-                        where g = actual cost, h = heuristic estimate</p>
+                            <code>f(n) = g(n) + h(n)</code><br>
+                            where g = actual cost, h = heuristic estimate
+                        </p>
                     </div>
                 </div>
             </div>
         </main>
 
         <footer>
-            Made with ❤️ by <strong>Hamid Kamal</strong> | 
-            <a href="https://github.com/YOUR_USERNAME/Syntecxhub_Maze_Solver_AStar" target="_blank">View on GitHub</a>
+            Made with ❤️ by <strong>Hamid Kamal</strong> |
+            <a href="https://github.com/hamid220-kamal/Syntecxhub_Maze_Solver_AStar" target="_blank">View on GitHub</a>
         </footer>
     </div>
 
@@ -594,16 +649,16 @@
             constructor() {
                 this.items = [];
             }
-            
+
             enqueue(item, priority) {
                 this.items.push({ item, priority });
                 this.items.sort((a, b) => a.priority - b.priority);
             }
-            
+
             dequeue() {
                 return this.items.shift()?.item;
             }
-            
+
             isEmpty() {
                 return this.items.length === 0;
             }
@@ -634,7 +689,7 @@
                 if (!this.goal) return 0;
                 const dr = Math.abs(pos[0] - this.goal[0]);
                 const dc = Math.abs(pos[1] - this.goal[1]);
-                
+
                 switch (this.heuristic) {
                     case 'euclidean': return Math.sqrt(dr * dr + dc * dc);
                     case 'chebyshev': return Math.max(dr, dc);
@@ -646,11 +701,11 @@
                 const [row, col] = pos;
                 const neighbors = [];
                 const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-                
+
                 for (const [dr, dc] of directions) {
                     const newRow = row + dr;
                     const newCol = col + dc;
-                    if (newRow >= 0 && newRow < this.rows && 
+                    if (newRow >= 0 && newRow < this.rows &&
                         newCol >= 0 && newCol < this.cols &&
                         this.maze[newRow][newCol] !== CELL_TYPES.WALL) {
                         neighbors.push([newRow, newCol]);
@@ -669,7 +724,7 @@
                 const closedSet = new Set();
                 const gScores = {};
                 const parents = {};
-                
+
                 const startKey = this.start.join(',');
                 gScores[startKey] = 0;
                 openSet.enqueue(this.start, this.heuristicFn(this.start));
@@ -677,7 +732,7 @@
                 while (!openSet.isEmpty()) {
                     const current = openSet.dequeue();
                     const currentKey = current.join(',');
-                    
+
                     if (closedSet.has(currentKey)) continue;
                     closedSet.add(currentKey);
                     this.visitedOrder.push(current);
@@ -745,7 +800,7 @@
         }
 
         function createEmptyMaze() {
-            maze = Array(gridSize).fill(null).map(() => 
+            maze = Array(gridSize).fill(null).map(() =>
                 Array(gridSize).fill(CELL_TYPES.EMPTY)
             );
             // Set default start and goal
@@ -756,23 +811,23 @@
         function renderMaze() {
             gridContainer.innerHTML = '';
             gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 35px)`;
-            
+
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell ' + getCellClass(maze[i][j]);
                     cell.dataset.row = i;
                     cell.dataset.col = j;
-                    
+
                     // Show S and G labels
                     if (maze[i][j] === CELL_TYPES.START) cell.textContent = 'S';
                     if (maze[i][j] === CELL_TYPES.GOAL) cell.textContent = 'G';
-                    
+
                     cell.addEventListener('click', () => handleCellClick(i, j));
                     cell.addEventListener('mouseenter', (e) => {
                         if (e.buttons === 1) handleCellClick(i, j);
                     });
-                    
+
                     gridContainer.appendChild(cell);
                 }
             }
@@ -791,7 +846,7 @@
 
         function handleCellClick(row, col) {
             if (isAnimating) return;
-            
+
             // Clear previous start/goal if setting new one
             if (drawMode === 'start') {
                 for (let i = 0; i < gridSize; i++) {
@@ -816,7 +871,7 @@
                     maze[row][col] = CELL_TYPES.EMPTY;
                 }
             }
-            
+
             clearPathAndVisited();
             renderMaze();
         }
@@ -834,7 +889,7 @@
         function generateRandomMaze() {
             if (isAnimating) return;
             createEmptyMaze();
-            
+
             const wallDensity = 0.3;
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
@@ -843,7 +898,7 @@
                     }
                 }
             }
-            
+
             // Clear path around start and goal
             const clearAround = (row, col) => {
                 for (let dr = -1; dr <= 1; dr++) {
@@ -859,7 +914,7 @@
             };
             clearAround(0, 0);
             clearAround(gridSize - 1, gridSize - 1);
-            
+
             renderMaze();
             resetStats();
         }
@@ -869,10 +924,10 @@
                 stopAnimation();
                 return;
             }
-            
+
             clearPathAndVisited();
             renderMaze();
-            
+
             const startTime = performance.now();
             const solver = new MazeSolver(maze, heuristicSelect.value);
             const result = solver.solve();
@@ -887,9 +942,9 @@
             if (animate) {
                 isAnimating = true;
                 solveBtn.textContent = '⏹️ Stop';
-                
+
                 const speed = parseInt(speedSlider.value);
-                
+
                 // Animate visited nodes
                 for (let i = 0; i < solver.visitedOrder.length; i++) {
                     const [row, col] = solver.visitedOrder[i];
@@ -912,7 +967,7 @@
                         }
                     }
                 }
-                
+
                 isAnimating = false;
                 solveBtn.textContent = '▶️ Solve Maze';
             } else {
@@ -997,4 +1052,5 @@
         init();
     </script>
 </body>
+
 </html>

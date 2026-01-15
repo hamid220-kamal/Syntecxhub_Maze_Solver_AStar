@@ -187,7 +187,7 @@ GraphicalVisualizer.animate_search(solver, path)
 
 ## 👨‍💻 Author
 
-**Your Name**  
+**Hamid Kamal**  
 Syntecxhub AI Internship Program
 
 ## 📄 License

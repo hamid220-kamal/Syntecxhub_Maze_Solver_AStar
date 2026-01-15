@@ -3,7 +3,7 @@ Maze Visualizer - Console & Graphical Display
 ==============================================
 Provides both console-based ASCII visualization and matplotlib animated plots.
 
-Author: Your Name
+Author: Hamid Kamal
 Project: Syntecxhub AI Internship - Project 1
 """
 

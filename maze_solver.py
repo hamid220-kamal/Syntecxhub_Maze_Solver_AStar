@@ -3,7 +3,7 @@ A* Maze Solver - Core Implementation
 =====================================
 Solves mazes using the A* pathfinding algorithm with Manhattan/Euclidean heuristics.
 
-Author: Your Name
+Author: Hamid Kamal
 Project: Syntecxhub AI Internship - Project 1
 """
 
