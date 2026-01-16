@@ -3,6 +3,7 @@
 
 const CELL = { EMPTY: 0, WALL: 1, START: 2, GOAL: 3, PATH: 4, VISITED: 5 };
 let maze = [], gridSize = 15, drawMode = 'wall', isAnimating = false;
+let savedMaze = null;
 
 // DOM Elements
 const $ = id => document.getElementById(id);
@@ -305,6 +306,44 @@ function generateMaze(type) {
     updateStats(0, 0, 0, 0);
 }
 
+// Features: Save/Load, Export, Theme
+function saveMaze() {
+    localStorage.setItem('savedMaze', JSON.stringify({ maze, gridSize }));
+    alert('✅ Maze Saved!');
+}
+
+function loadMaze() {
+    const data = localStorage.getItem('savedMaze');
+    if (!data) { alert('❌ No saved maze found!'); return; }
+    const parsed = JSON.parse(data);
+    maze = parsed.maze;
+    gridSize = parsed.gridSize;
+    $('grid-size').value = gridSize > 25 ? 25 : (gridSize < 10 ? 10 : gridSize); // Approximate
+    renderMaze(gridEl, maze);
+    updateStats(0, 0, 0, 0);
+}
+
+function exportImage() {
+    html2canvas(document.querySelector('.maze-card')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'maze_solution.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
+function toggleTheme() {
+    const body = document.body;
+    const btn = $('theme-btn');
+    if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+        btn.textContent = '🌙';
+    } else {
+        body.setAttribute('data-theme', 'light');
+        btn.textContent = '☀️';
+    }
+}
+
 // Event Listeners
 function setupEventListeners() {
     $('solve-btn').onclick = solve;
@@ -313,6 +352,11 @@ function setupEventListeners() {
     $('gen-backtrack').onclick = () => generateMaze('backtrack');
     $('gen-prims').onclick = () => generateMaze('prims');
     $('gen-random').onclick = () => generateMaze('random');
+
+    $('save-btn').onclick = saveMaze;
+    $('load-btn').onclick = loadMaze;
+    $('export-btn').onclick = exportImage;
+    $('theme-btn').onclick = toggleTheme;
 
     $('grid-size').onchange = () => { gridSize = parseInt($('grid-size').value); createEmptyMaze(); renderMaze(gridEl, maze); };
     speedSlider.oninput = () => $('speed-value').textContent = speedSlider.value;

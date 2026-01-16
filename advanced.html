@@ -17,7 +17,10 @@
         <header>
             <h1>🧩 A* Maze Solver <span class="pro-badge">PRO</span></h1>
             <p class="subtitle">Advanced AI Pathfinding with Algorithm Comparison</p>
-            <span class="badge">Syntecxhub AI Internship - Project 1</span>
+            <div class="header-badges">
+                <span class="badge">Syntecxhub AI Internship - Project 1</span>
+                <button id="theme-btn" class="theme-toggle" title="Toggle Theme">🌙</button>
+            </div>
         </header>
 
         <main class="main-grid">
@@ -144,6 +147,17 @@
                 </div>
 
                 <div class="card">
+                    <h2 class="card-title">💾 Save & Export</h2>
+                    <div class="btn-group">
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" id="save-btn" style="flex: 1;">💾 Save</button>
+                            <button class="btn btn-secondary" id="load-btn" style="flex: 1;">📂 Load</button>
+                        </div>
+                        <button class="btn btn-secondary" id="export-btn">📸 Export Image</button>
+                    </div>
+                </div>
+
+                <div class="card">
                     <h2 class="card-title">📊 Statistics</h2>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -181,6 +195,7 @@
         </footer>
     </div>
 
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="algorithms.js"></script>
     <script src="app.js"></script>
 </body>
