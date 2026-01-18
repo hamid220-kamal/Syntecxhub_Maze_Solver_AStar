@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Hamid Kamal
+# Syntecxhub AI Internship
+
 """
 Maze Visualizer - Console & Graphical Display
 ==============================================

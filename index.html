@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- 
+  Copyright (c) 2026 Hamid Kamal
+  Syntecxhub AI Internship
+-->
 <html lang="en">
 
 <head>
@@ -55,6 +59,28 @@
                 radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+        }
+
+        /* Heatmap Intensity Scales */
+        .cell.intensity-1 {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .cell.intensity-2 {
+            background: rgba(99, 102, 241, 0.4);
+        }
+
+        .cell.intensity-3 {
+            background: rgba(139, 92, 246, 0.6);
+        }
+
+        .cell.intensity-4 {
+            background: rgba(139, 92, 246, 0.8);
+        }
+
+        .cell.intensity-5 {
+            background: rgba(188, 19, 254, 1);
+            box-shadow: inset 0 0 10px rgba(188, 19, 254, 0.5);
         }
 
         .container {
@@ -546,8 +572,8 @@
                 <div class="draw-mode">
                     <div class="draw-mode-title">🖌️ Draw Mode (Click cells to edit)</div>
                     <div class="mode-buttons">
-                        <button class="mode-btn empty-mode active" data-mode="empty">Empty</button>
-                        <button class="mode-btn wall-mode" data-mode="wall">Wall</button>
+                        <button class="mode-btn empty-mode" data-mode="empty">Empty</button>
+                        <button class="mode-btn wall-mode active" data-mode="wall">Wall</button>
                         <button class="mode-btn start-mode" data-mode="start">Start</button>
                         <button class="mode-btn goal-mode" data-mode="goal">Goal</button>
                     </div>
@@ -587,6 +613,9 @@
                     <div class="btn-group">
                         <button class="btn btn-primary" id="solve-btn">▶️ Solve Maze</button>
                         <button class="btn btn-secondary" id="step-btn">⏭️ Step Through</button>
+                        <button class="btn btn-secondary" id="heatmap-toggle">
+                            <i class="fa-solid fa-fire"></i> Heatmap: OFF
+                        </button>
                         <button class="btn btn-success" id="random-btn">🎲 Random Maze</button>
                         <button class="btn btn-danger" id="clear-btn">🗑️ Clear All</button>
                     </div>
@@ -620,17 +649,64 @@
                             where g = actual cost, h = heuristic estimate
                         </p>
                     </div>
+
+                    <div class="verdict-panel" id="verdict-panel">
+                        <div class="verdict-header">System Verdict <span id="verdict-score">A+</span></div>
+                        <div class="verdict-text" id="verdict-text">Solution path is highly optimal.</div>
+                    </div>
                 </div>
             </div>
         </main>
 
         <footer>
             Made with ❤️ by <strong>Hamid Kamal</strong> |
-            <a href="https://github.com/hamid220-kamal/Syntecxhub_Maze_Solver_AStar" target="_blank">View on GitHub</a>
+            <a href="https://hamid-ai-dev.vercel.app/" target="_blank">View Portfolio</a> |
+            <a href="#" id="project-info-link">Project Architecture</a>
         </footer>
     </div>
 
+    <!-- Project Information Modal -->
+    <div id="project-modal" class="modal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+        <div class="modal-content"
+            style="background: var(--bg-card); color: var(--text-primary); margin: 10% auto; padding: 30px; border: 1px solid var(--accent-primary); width: 500px; border-radius: 16px; position: relative;">
+            <h2 style="margin-bottom: 20px; color: var(--accent-primary);">System Architecture</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
+                <div class="info-item">
+                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Developer
+                    </h4>
+                    <p>Hamid Kamal</p>
+                </div>
+                <div class="info-item">
+                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Algorithm
+                    </h4>
+                    <p>A* Search Engine</p>
+                </div>
+                <div class="info-item">
+                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Heuristics
+                    </h4>
+                    <p>Manhattan / Euclidean</p>
+                </div>
+                <div class="info-item">
+                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Framework
+                    </h4>
+                    <p>Vanilla JS / HTML5</p>
+                </div>
+            </div>
+            <p style="margin-top: 25px; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">An advanced
+                pathfinding visualization tool engineered for Syntecxhub. Features real-time heuristic analysis and
+                exploration intensity mapping.</p>
+            <button onclick="document.getElementById('project-modal').style.display='none'" class="btn btn-primary"
+                style="margin-top: 25px; width: 100%;">Close Interface</button>
+        </div>
+    </div>
+
     <script>
+        // Project Info Modal Logic
+        document.getElementById('project-info-link').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('project-modal').style.display = 'block';
+        };
         // ============================================
         // A* MAZE SOLVER - INTERACTIVE WEB VERSION
         // Syntecxhub AI Internship - Project 1
@@ -815,7 +891,7 @@
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
                     const cell = document.createElement('div');
-                    cell.className = 'cell ' + getCellClass(maze[i][j]);
+                    cell.className = 'cell ' + getCellClass(maze[i][j], i, j);
                     cell.dataset.row = i;
                     cell.dataset.col = j;
 
@@ -833,7 +909,14 @@
             }
         }
 
-        function getCellClass(type) {
+        function getCellClass(type, row, col) {
+            if (isHeatmapEnabled && type === CELL_TYPES.VISITED) {
+                const visits = cellVisits[`${row},${col}`] || 0;
+                // Scale intensity (cap at 5)
+                const intensity = Math.min(Math.ceil(visits / 2), 5);
+                return `visited intensity-${intensity}`;
+            }
+
             switch (type) {
                 case CELL_TYPES.WALL: return 'wall';
                 case CELL_TYPES.START: return 'start';
@@ -919,6 +1002,52 @@
             resetStats();
         }
 
+        // Application state enhancements
+        let isHeatmapEnabled = false;
+        const cellVisits = {}; // To track visit frequency for intensity map
+
+        function toggleHeatmap() {
+            isHeatmapEnabled = !isHeatmapEnabled;
+            const btn = document.getElementById('heatmap-toggle');
+            btn.classList.toggle('active');
+            btn.innerHTML = isHeatmapEnabled ? '<i class="fa-solid fa-fire"></i> Heatmap: ON' : '<i class="fa-solid fa-fire"></i> Heatmap: OFF';
+            renderMaze();
+        }
+
+        /** 
+         * Calculates the 'Performance Verdict' based on algorithm efficiency.
+         * Compares A* results to grid geometry to provide a senior-level score.
+         */
+        function updateVerdict(pathLength, explored) {
+            const verdictPanel = document.getElementById('verdict-panel');
+            const verdictScore = document.getElementById('verdict-score');
+            const verdictText = document.getElementById('verdict-text');
+
+            if (!pathLength) {
+                verdictPanel.style.display = 'none';
+                return;
+            }
+
+            verdictPanel.style.display = 'block';
+
+            // Heuristic efficiency ratio
+            const ratio = explored / pathLength;
+
+            if (ratio < 1.5) {
+                verdictScore.textContent = "A+";
+                verdictScore.style.color = "var(--success)";
+                verdictText.textContent = "Highly efficient path. Minimal node exploration required.";
+            } else if (ratio < 2.5) {
+                verdictScore.textContent = "A";
+                verdictScore.style.color = "var(--success)";
+                verdictText.textContent = "Optimal trajectory found with standard heuristic overhead.";
+            } else {
+                verdictScore.textContent = "B+";
+                verdictScore.style.color = "var(--warning)";
+                verdictText.textContent = "Valid path found, but exploration footprint was broader than average.";
+            }
+        }
+
         async function solveMaze(animate = true) {
             if (isAnimating) {
                 stopAnimation();
@@ -926,6 +1055,13 @@
             }
 
             clearPathAndVisited();
+            // Reset visit tracking for fresh heatmap
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    cellVisits[`${r},${c}`] = 0;
+                }
+            }
+
             renderMaze();
 
             const startTime = performance.now();
@@ -934,20 +1070,21 @@
             const endTime = performance.now();
 
             if (!result.path) {
-                alert('❌ No path found! The goal is unreachable.');
+                showToast('No possible path to goal.', 'warning');
                 updateStats(0, result.nodesExplored, endTime - startTime, 0);
+                updateVerdict(0, 0);
                 return;
             }
 
             if (animate) {
                 isAnimating = true;
                 solveBtn.textContent = '⏹️ Stop';
-
                 const speed = parseInt(speedSlider.value);
 
-                // Animate visited nodes
                 for (let i = 0; i < solver.visitedOrder.length; i++) {
                     const [row, col] = solver.visitedOrder[i];
+                    cellVisits[`${row},${col}`] = (cellVisits[`${row},${col}`] || 0) + 1;
+
                     if (maze[row][col] === CELL_TYPES.EMPTY) {
                         await delay(speed);
                         if (!isAnimating) break;
@@ -956,7 +1093,6 @@
                     }
                 }
 
-                // Animate path
                 if (isAnimating) {
                     for (const [row, col] of result.path) {
                         if (maze[row][col] !== CELL_TYPES.START && maze[row][col] !== CELL_TYPES.GOAL) {
@@ -971,21 +1107,18 @@
                 isAnimating = false;
                 solveBtn.textContent = '▶️ Solve Maze';
             } else {
-                // Instant solve
                 for (const [row, col] of solver.visitedOrder) {
-                    if (maze[row][col] === CELL_TYPES.EMPTY) {
-                        maze[row][col] = CELL_TYPES.VISITED;
-                    }
+                    cellVisits[`${row},${col}`] = (cellVisits[`${row},${col}`] || 0) + 1;
+                    if (maze[row][col] === CELL_TYPES.EMPTY) maze[row][col] = CELL_TYPES.VISITED;
                 }
                 for (const [row, col] of result.path) {
-                    if (maze[row][col] !== CELL_TYPES.START && maze[row][col] !== CELL_TYPES.GOAL) {
-                        maze[row][col] = CELL_TYPES.PATH;
-                    }
+                    if (maze[row][col] !== CELL_TYPES.START && maze[row][col] !== CELL_TYPES.GOAL) maze[row][col] = CELL_TYPES.PATH;
                 }
                 renderMaze();
             }
 
             updateStats(result.pathLength, result.nodesExplored, endTime - startTime, result.cost);
+            updateVerdict(result.pathLength, result.nodesExplored);
         }
 
         function stopAnimation() {
@@ -1001,7 +1134,8 @@
             const cells = gridContainer.querySelectorAll('.cell');
             const index = row * gridSize + col;
             const cell = cells[index];
-            cell.className = 'cell ' + getCellClass(maze[row][col]);
+            if (!cell) return;
+            cell.className = 'cell ' + getCellClass(maze[row][col], row, col);
         }
 
         function updateStats(pathLength, explored, time, cost) {
@@ -1040,6 +1174,8 @@
         randomBtn.addEventListener('click', generateRandomMaze);
         clearBtn.addEventListener('click', clearAll);
 
+        document.getElementById('heatmap-toggle').addEventListener('click', toggleHeatmap);
+
         modeButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 modeButtons.forEach(b => b.classList.remove('active'));
@@ -1047,6 +1183,9 @@
                 drawMode = btn.dataset.mode;
             });
         });
+
+        // Initialize Application
+        init();
 
         // Start
         init();

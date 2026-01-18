@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Hamid Kamal
+ * Syntecxhub AI Internship
+ */
+
 // A* Maze Solver Pro - Main Application
 // Syntecxhub AI Internship - Project 1 (Enhanced)
 
@@ -5,7 +10,11 @@ const CELL = { EMPTY: 0, WALL: 1, START: 2, GOAL: 3, PATH: 4, VISITED: 5 };
 let maze = [], gridSize = 15, drawMode = 'wall', isAnimating = false;
 let savedMaze = null;
 
-// DOM Elements
+// Persistent analytical state
+let isHeatmapEnabled = false;
+const cellVisits = {};
+
+// DOM Selectors
 const $ = id => document.getElementById(id);
 const gridEl = $('maze-grid');
 const speedSlider = $('speed');
@@ -51,7 +60,18 @@ function renderMaze(container, mazeData, cellSize = 28) {
     }
 }
 
-function getCellClass(type) {
+/** 
+ * Maps logical cell types to CSS class identifiers.
+ * Dynamically injects intensity-scale classes when heatmap logic is active.
+ */
+function getCellClass(type, row, col) {
+    if (isHeatmapEnabled && type === CELL.VISITED) {
+        const visits = cellVisits[`${row},${col}`] || 0;
+        // Map frequency to 5-stage intensity scale
+        const intensity = Math.min(Math.ceil(visits / 2), 5);
+        return `visited intensity-${intensity}`;
+    }
+
     return ['empty', 'wall', 'start', 'goal', 'path', 'visited'][type] || 'empty';
 }
 
@@ -194,6 +214,12 @@ async function solve() {
     if (isAnimating) { isAnimating = false; return; }
 
     clearPathVisited();
+    // Reset analytical frequency mapping
+    for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+            cellVisits[`${r},${c}`] = 0;
+        }
+    }
     renderMaze(gridEl, maze);
 
     const start = performance.now();
@@ -201,17 +227,46 @@ async function solve() {
     const time = performance.now() - start;
 
     if (!result.path) {
-        alert('❌ No path found!');
+        alert('❌ Terminal reach failure: Goal isolated.');
         updateStats(0, result.visitedOrder?.length || 0, time, 0);
+        calculateVerdict(0, 0);
         return;
     }
 
     if (learningMode.checked) showLearningInfo(result);
 
-    await animateSolution(result.visitedOrder, result.path, parseInt(speedSlider.value));
+    // Track visits during animation
+    isAnimating = true;
+    $('solve-btn').textContent = '⏹️ Stop';
+    const speed = parseInt(speedSlider.value);
+
+    for (const [r, c] of result.visitedOrder) {
+        if (!isAnimating) break;
+        cellVisits[`${r},${c}`] = (cellVisits[`${r},${c}`] || 0) + 1;
+        if (maze[r][c] === CELL.EMPTY) {
+            maze[r][c] = CELL.VISITED;
+            updateCell(r, c);
+        }
+        await delay(speed);
+    }
+
+    if (result.path && isAnimating) {
+        for (const [r, c] of result.path) {
+            if (!isAnimating) break;
+            if (maze[r][c] !== CELL.START && maze[r][c] !== CELL.GOAL) {
+                maze[r][c] = CELL.PATH;
+                updateCell(r, c);
+            }
+            await delay(speed * 2);
+        }
+    }
+
+    isAnimating = false;
+    $('solve-btn').textContent = '▶️ Solve';
 
     const efficiency = ((result.path.length / result.visitedOrder.length) * 100).toFixed(1);
     updateStats(result.path.length, result.visitedOrder.length, time, efficiency);
+    calculateVerdict(result.path.length, result.visitedOrder.length);
 }
 
 function updateStats(pathLen, explored, time, efficiency) {
@@ -261,30 +316,35 @@ async function algorithmRace() {
         const container = $(`maze-${algo.id}`);
         const statsEl = $(`stats-${algo.id}`);
 
-        const mazeCopy = maze.map(r => [...r]);
-        renderMaze(container, mazeCopy, 18);
+        try {
+            const mazeCopy = maze.map(r => [...r]);
+            renderMaze(container, mazeCopy, 18);
 
-        const startTime = performance.now();
-        const result = algo.fn();
-        const time = performance.now() - startTime;
+            const startTime = performance.now();
+            const result = algo.fn();
+            const time = performance.now() - startTime;
 
-        // Animate this algorithm
-        if (result.visitedOrder) {
-            for (const [r, c] of result.visitedOrder) {
-                if (mazeCopy[r][c] === CELL.EMPTY) mazeCopy[r][c] = CELL.VISITED;
+            // Animate this algorithm
+            if (result.visitedOrder) {
+                for (const [r, c] of result.visitedOrder) {
+                    if (mazeCopy[r][c] === CELL.EMPTY) mazeCopy[r][c] = CELL.VISITED;
+                }
             }
-        }
-        if (result.path) {
-            for (const [r, c] of result.path) {
-                if (mazeCopy[r][c] !== CELL.START && mazeCopy[r][c] !== CELL.GOAL)
-                    mazeCopy[r][c] = CELL.PATH;
+            if (result.path) {
+                for (const [r, c] of result.path) {
+                    if (mazeCopy[r][c] !== CELL.START && mazeCopy[r][c] !== CELL.GOAL)
+                        mazeCopy[r][c] = CELL.PATH;
+                }
             }
-        }
 
-        renderMaze(container, mazeCopy, 18);
-        statsEl.textContent = result.path
-            ? `Path: ${result.path.length} | Explored: ${result.visitedOrder?.length || 0} | ${time.toFixed(1)}ms`
-            : 'No path';
+            renderMaze(container, mazeCopy, 18);
+            statsEl.textContent = result.path
+                ? `Path: ${result.path.length} | Explored: ${result.visitedOrder?.length || 0} | ${time.toFixed(1)}ms`
+                : 'No path found';
+        } catch (error) {
+            console.error(`Error in ${algo.name}:`, error);
+            statsEl.textContent = 'Error running algorithm';
+        }
     }
 }
 
@@ -357,6 +417,9 @@ function setupEventListeners() {
     $('load-btn').onclick = loadMaze;
     $('export-btn').onclick = exportImage;
     $('theme-btn').onclick = toggleTheme;
+
+    const hBtn = $('heatmap-toggle');
+    if (hBtn) hBtn.onclick = toggleHeatmap;
 
     $('grid-size').onchange = () => { gridSize = parseInt($('grid-size').value); createEmptyMaze(); renderMaze(gridEl, maze); };
     speedSlider.oninput = () => $('speed-value').textContent = speedSlider.value;

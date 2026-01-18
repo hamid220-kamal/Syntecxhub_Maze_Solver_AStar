@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Hamid Kamal
+# Syntecxhub AI Internship
+
 """
 A* Maze Solver - Core Implementation
 =====================================

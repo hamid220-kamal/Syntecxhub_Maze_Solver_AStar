@@ -1,20 +1,36 @@
-// Advanced Pathfinding Algorithms Module
-// Syntecxhub AI Internship - Project 1 (Enhanced)
+/**
+ * @file algorithms.js
+ * @author Hamid Kamal
+ * @description Advanced pathfinding logic suite for Syntecxhub AI Internship.
+ * Implements industry-standard heuristic search and graph traversal algorithms.
+ */
 
 const Algorithms = {
-    // Dijkstra's Algorithm (A* without heuristic)
+    /** 
+     * Dijkstra's Algorithm
+     * Uniform-cost search that expands nodes in order of their cumulative distance from start.
+     * Guaranteed to find the absolute shortest path.
+     */
     dijkstra: function (maze, start, goal) {
         return this.astar(maze, start, goal, () => 0, "Dijkstra");
     },
 
-    // Greedy Best-First (only heuristic, no g-cost)
+    /**
+     * Greedy Best-First Search
+     * Uses only the heuristic to direct the search, prioritizing nodes closest to the goal.
+     * Efficient but does not guarantee the shortest path.
+     */
     greedy: function (maze, start, goal) {
         return this.astar(maze, start, goal, (pos) => {
             return Math.abs(pos[0] - goal[0]) + Math.abs(pos[1] - goal[1]);
         }, "Greedy", true);
     },
 
-    // BFS (Breadth-First Search)
+    /**
+     * Breadth-First Search (BFS)
+     * Level-order traversal that finds the path with the minimum number of steps.
+     * Optimal for unweighted grids.
+     */
     bfs: function (maze, start, goal) {
         const rows = maze.length, cols = maze[0].length;
         const queue = [[start, [start]]];
@@ -25,10 +41,12 @@ const Algorithms = {
             const [current, path] = queue.shift();
             visitedOrder.push(current);
 
+            // Terminal condition check
             if (current[0] === goal[0] && current[1] === goal[1]) {
                 return { path, visitedOrder, name: "BFS" };
             }
 
+            // Standard 4-connectivity expansion
             for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
                 const nr = current[0] + dr, nc = current[1] + dc;
                 const key = `${nr},${nc}`;
@@ -42,7 +60,11 @@ const Algorithms = {
         return { path: null, visitedOrder, name: "BFS" };
     },
 
-    // A* with configurable heuristic
+    /**
+     * A* Search Algorithm (The Core Engine)
+     * Combines g-cost (distance from start) and h-cost (estimated distance to goal)
+     * to perform a directed, optimal search for the target.
+     */
     astar: function (maze, start, goal, heuristic, name = "A*", greedy = false) {
         const rows = maze.length, cols = maze[0].length;
         const openSet = [{ pos: start, g: 0, f: heuristic(start), path: [start] }];
@@ -51,6 +73,7 @@ const Algorithms = {
         const gScores = { [start.join(',')]: 0 };
 
         while (openSet.length > 0) {
+            // Prioritise lowest total cost (f-score)
             openSet.sort((a, b) => a.f - b.f);
             const current = openSet.shift();
             const key = current.pos.join(',');
@@ -69,6 +92,8 @@ const Algorithms = {
 
                 if (nr >= 0 && nr < rows && nc >= 0 && nc < cols &&
                     maze[nr][nc] !== 1 && !visited.has(nKey)) {
+
+                    // Greedy mode disregards historical cost to simulate heuristic-only behavior
                     const tentativeG = greedy ? 0 : current.g + 1;
                     if (!(nKey in gScores) || tentativeG < gScores[nKey]) {
                         gScores[nKey] = tentativeG;
