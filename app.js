@@ -404,6 +404,71 @@ function toggleTheme() {
     }
 }
 
+// Heatmap Toggle
+function toggleHeatmap() {
+    isHeatmapEnabled = !isHeatmapEnabled;
+    const btn = $('heatmap-toggle');
+    if (btn) {
+        btn.classList.toggle('active', isHeatmapEnabled);
+        btn.textContent = isHeatmapEnabled ? '🔥 Heatmap: ON' : '🔥 Heatmap: OFF';
+        // Add active style if needed or rely on class
+        if (isHeatmapEnabled) {
+            btn.style.borderColor = 'var(--accent-primary)';
+            btn.style.boxShadow = '0 0 15px var(--accent-glow)';
+        } else {
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
+        }
+    }
+    renderMaze(gridEl, maze);
+}
+
+// Performance Verdict System
+function calculateVerdict(pathLen, explored) {
+    const verdictPanel = $('verdict-panel');
+    const verdictScore = $('verdict-score');
+    const verdictText = $('verdict-text');
+
+    if (!verdictPanel) return;
+
+    verdictPanel.style.display = 'block';
+
+    if (pathLen === 0) {
+        verdictScore.textContent = 'F';
+        verdictScore.style.color = 'var(--danger)';
+        verdictText.textContent = 'Mission Failed: Goal unreachable.';
+        return;
+    }
+
+    // Efficiency ratio: Higher is better (less wasted exploration)
+    const ratio = pathLen / explored;
+    let grade = 'C';
+    let color = 'var(--text-muted)';
+    let msg = 'Path found, but search was inefficient.';
+
+    if (ratio > 0.6) {
+        grade = 'S';
+        color = 'var(--accent-primary)'; // Diamond/Special score
+        msg = 'Perfect execution! Maximum efficiency.';
+    } else if (ratio > 0.4) {
+        grade = 'A+';
+        color = 'var(--success)';
+        msg = 'Excellent routing! Minimal deviation.';
+    } else if (ratio > 0.25) {
+        grade = 'A';
+        color = 'var(--success)';
+        msg = 'Great job. Optimal path found.';
+    } else if (ratio > 0.1) {
+        grade = 'B';
+        color = 'var(--warning)';
+        msg = 'Good attempt. Exploration was substantial.';
+    }
+
+    verdictScore.textContent = grade;
+    verdictScore.style.color = color;
+    verdictText.textContent = msg;
+}
+
 // Event Listeners
 function setupEventListeners() {
     $('solve-btn').onclick = solve;
